@@ -13,7 +13,7 @@ bool gauss_eleminate(double a[], double b[], int n, double x[])
 	int id1 = 0;
 	int id2 = 0;
 
-	for (int i = 0; i < n-1; ++i, id1 += n) {
+	for (int i = 0; i < n; ++i, id1 += n) {
 		if (fabs(a[id1+i]) < EPS)
 			return false;
 
