@@ -5,24 +5,39 @@ using namespace std;
 
 #define EPS	0.0000000001
 
-bool LUSolution(double A[], double b[], int n, double x[])
+bool PALUSolution(double A[], double b[], int n, double x[])
 {
 	if (A == NULL || b == NULL || n <= 0 || x == NULL)
 		return false;
 
 	int id1 = 0;
-	int id2 = 0;
 
-	for (int i = 0; i < n; ++i, id1 += n) {
-		if (fabs(A[id1+i]) < EPS)
-			return false;
+	for (int i = 0; i < n-1; ++i, id1 += n) {
+		double pmax = fabs(A[id1+i]);
+		int imax = i;
+		int id2 = id1+i+n;
+
+		for (int j = i+1; j < n; ++j, id2 += n) {
+			if (pmax < fabs(A[id2])) {
+				imax = j;
+				pmax = fabs(A[id2]);
+			}
+		}
+
+		if (pmax < EPS) return false;
+
+		if (imax != i) {
+			id2 = imax*n;
+			swap(b[i], b[imax]);
+			for (int j = 0; j < n; ++j)
+				swap(A[id1+j], A[id2+j]);
+		}
 
 		id2 = id1+n;
-
 		for (int j = i+1; j < n; ++j, id2 += n) {
 			double mult = A[id2+i] / A[id1+i];
 			A[id2+i] = mult;
-			for (int k = i + 1; k < n; ++k)
+			for (int k = i+1; k < n; ++k)
 				A[id2+k] -= mult*A[id1+k];
 		}
 	}
@@ -58,28 +73,28 @@ void print_matrix(double a[], int m, int n)
 int main()
 {
 	double A1[] = {
-		1,  1,
-		3, -4
+		2,  1,  5,
+		4,  4, -4,
+		1,  3,  1
 	};
-	double b1[] = { 3, 2 };
-	double x1[2] = {0};
+	double b1[] = { 5, 0, 6 };
+	double x1[3] = { 0 };
 
-	LUSolution(A1, b1, 2, x1);
+	PALUSolution(A1, b1, 3, x1);
 	cout << "x1 = " << endl;
-	print_matrix(x1, 1, 2);
+	print_matrix(x1, 1, 3);
 
 
 	double A2[] = {
-		1,  2, -1,
-		2,  1, -2,
-	   -3,  1,  1
+		2,  3,
+		3,  2,
 	};
-	double b2[] = { 3, 3, -6 };
-	double x2[3] = { 0 };
+	double b2[] = { 4, 1 };
+	double x2[2] = { 0 };
 
-	LUSolution(A2, b2, 3, x2);
+	PALUSolution(A2, b2, 2, x2);
 	cout << "x2 = " << endl;
-	print_matrix(x2, 1, 3);
+	print_matrix(x2, 1, 2);
 
 	return 0;
 }
